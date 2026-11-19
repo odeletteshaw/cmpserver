@@ -33,14 +33,14 @@ pip install -e .
 pip install cmp-mock-server
 ```
 
-> **安装名与导入名**：PyPI 包名为 `cmp-mock-server`，导入名仍为 `cmp_mock_tester`。
+> **安装名与导入名**：PyPI 包名为 `cmp-mock-server`，导入名为 `cmp_mock_server`（同一名字的连字符 / 下划线两种写法）。
 
 > **Python 版本**：3.8+ 均可（纯 Python 实现，已在 3.10 / 3.14 / 3.15 实测通过）。
 
 安装后可用一行命令验证核心模块可导入：
 
 ```bash
-python -c "from cmp_mock_tester import CmpServer, MockSpec, OMIT, general_name; print('OK')"
+python -c "from cmp_mock_server import CmpServer, MockSpec, OMIT, general_name; print('OK')"
 ```
 
 ---
@@ -50,7 +50,7 @@ python -c "from cmp_mock_tester import CmpServer, MockSpec, OMIT, general_name; 
 ```python
 from oscrypto import asymmetric
 
-from cmp_mock_tester import CmpServer, create_root_cert
+from cmp_mock_server import CmpServer, create_root_cert
 
 # 1. 自签根 CA（onlyData=True 只返回材料，不落盘）
 issuer_key, issuer_cert = create_root_cert(onlyData=True)
@@ -87,8 +87,8 @@ mock.reset()           清空
 ### 示例
 
 ```python
-from cmp_mock_tester import OMIT, Raw, general_name
-from cmp_mock_tester.asn1crypto_cmp.rfc4210 import PKIFailureInfo
+from cmp_mock_server import OMIT, Raw, general_name
+from cmp_mock_server.asn1crypto_cmp.rfc4210 import PKIFailureInfo
 from datetime import datetime, timezone
 
 srv.mock.header['pvno']           = 'cmp1999'                          # 协议版本非法
@@ -126,13 +126,13 @@ srv.mock.extra_certs = OMIT                                           # 不带 e
 
 | 层 | 文件 | 职责 |
 |---|---|---|
-| 传输/路由 | `cmp_mock_tester/controllers/basic_server.py` | `@handler` 收集路由、后台线程 `HTTPServer`、`Request.send_der` |
-| 服务 | `cmp_mock_tester/controllers/cmp_server.py` | `POST /cmp` 收 DER；持有 `ca_info` + `mock` |
-| 消息分发 | `cmp_mock_tester/controllers/handlers/cmpHandler.py` | 按 `body.name` 分发并构建响应 |
-| 构建 | `cmp_mock_tester/cmpbuilder/__init__.py` | 三个 builder + `_assemble_message`（签名 + mock 注入） |
-| 字段注入 | `cmp_mock_tester/cmpbuilder/cmp_mock.py` | `MockSpec` —— 签名前篡改任意字段 |
-| ASN.1 | `cmp_mock_tester/asn1crypto_cmp/rfc4210.py` | CMP/CRMF 结构定义，`PKIMessage.load/dump` 的依据 |
-| 证书 | `cmp_mock_tester/scripts/ca.py` | 自签根 CA、签发 EE 证书 |
+| 传输/路由 | `cmp_mock_server/controllers/basic_server.py` | `@handler` 收集路由、后台线程 `HTTPServer`、`Request.send_der` |
+| 服务 | `cmp_mock_server/controllers/cmp_server.py` | `POST /cmp` 收 DER；持有 `ca_info` + `mock` |
+| 消息分发 | `cmp_mock_server/controllers/handlers/cmpHandler.py` | 按 `body.name` 分发并构建响应 |
+| 构建 | `cmp_mock_server/cmpbuilder/__init__.py` | 三个 builder + `_assemble_message`（签名 + mock 注入） |
+| 字段注入 | `cmp_mock_server/cmpbuilder/cmp_mock.py` | `MockSpec` —— 签名前篡改任意字段 |
+| ASN.1 | `cmp_mock_server/asn1crypto_cmp/rfc4210.py` | CMP/CRMF 结构定义，`PKIMessage.load/dump` 的依据 |
+| 证书 | `cmp_mock_server/scripts/ca.py` | 自签根 CA、签发 EE 证书 |
 
 `ir` / `kur` / `certconf` 由客户端（EE）主动发出，模拟器只**收取解析**、不构建；
 模拟器只构建 CA→EE 方向的 `ip` / `kup` / `pkiconf`（及 `error`）。
@@ -142,7 +142,7 @@ srv.mock.extra_certs = OMIT                                           # 不带 e
 ## 目录结构
 
 ```text
-cmp_mock_tester/
+cmp_mock_server/
 ├── __init__.py               # 公开 API re-export + __version__
 ├── cmpbuilder/               # CMP 报文构建器（包）
 │   ├── __init__.py           #   CMPResponseBuilder(ip/kup) / CMPConfirmBuilder(pkiconf) / CMPErrorBuilder(error)

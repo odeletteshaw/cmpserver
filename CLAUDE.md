@@ -9,7 +9,7 @@ Claude Code 在每次会话会自动读取本文件作为项目上下文。请�
 `ip`/`kup`/`pkiconf`。核心能力是一个**字段级 mock 注入器**，可在**签名前**
 篡改响应报文的任意字段，验证对端是否正确拒绝异常证书响应。
 
-代码已整理为单一顶层包 `cmp_mock_tester`，可 `pip install` / 发布到 PyPI。
+代码已整理为单一顶层包 `cmp_mock_server`，可 `pip install` / 发布到 PyPI。
 
 ## 架构（自顶向下）
 
@@ -23,13 +23,13 @@ Claude Code 在每次会话会自动读取本文件作为项目上下文。请�
 
 | 路径 | 职责 |
 |---|---|
-| `cmp_mock_tester/controllers/basic_server.py` | 轻量 HTTP 路由框架（`@handler`、`Request.send_der`→`application/pkixcmp`） |
-| `cmp_mock_tester/controllers/cmp_server.py` | `CmpServer`：`POST /cmp` 收 DER；持有 `ca_info`（CA 材料）+ `mock`（注入器） |
-| `cmp_mock_tester/controllers/handlers/cmpHandler.py` | `msgHandler` 按 `body.name` 分发并构建响应 |
-| `cmp_mock_tester/cmpbuilder/__init__.py` | 三个 builder + `_assemble_message`（签名 + mock 注入） |
-| `cmp_mock_tester/cmpbuilder/cmp_mock.py` | `MockSpec` / `OMIT` / `Raw` / `general_name` |
-| `cmp_mock_tester/asn1crypto_cmp/rfc4210.py` | CMP/CRMF 的 ASN.1 结构定义 |
-| `cmp_mock_tester/scripts/ca.py` | 自签根 CA、签发 EE 证书 |
+| `cmp_mock_server/controllers/basic_server.py` | 轻量 HTTP 路由框架（`@handler`、`Request.send_der`→`application/pkixcmp`） |
+| `cmp_mock_server/controllers/cmp_server.py` | `CmpServer`：`POST /cmp` 收 DER；持有 `ca_info`（CA 材料）+ `mock`（注入器） |
+| `cmp_mock_server/controllers/handlers/cmpHandler.py` | `msgHandler` 按 `body.name` 分发并构建响应 |
+| `cmp_mock_server/cmpbuilder/__init__.py` | 三个 builder + `_assemble_message`（签名 + mock 注入） |
+| `cmp_mock_server/cmpbuilder/cmp_mock.py` | `MockSpec` / `OMIT` / `Raw` / `general_name` |
+| `cmp_mock_server/asn1crypto_cmp/rfc4210.py` | CMP/CRMF 的 ASN.1 结构定义 |
+| `cmp_mock_server/scripts/ca.py` | 自签根 CA、签发 EE 证书 |
 
 ## 关键约定与不变量（改代码务必遵守）
 
@@ -45,12 +45,12 @@ Claude Code 在每次会话会自动读取本文件作为项目上下文。请�
    但 `PKIMessage.load()` 解析收到的报文时按 ASN.1 结构树必须用到它们。
    **删类前先做可达性确认**。已确认真正可删的只有 `CMPCertificate`、`PKIMessages`。
 
-4. **所有 import 走顶层包 `cmp_mock_tester`**：
-   - 包内互引：`from cmp_mock_tester.cmpbuilder import ...`、
-     `from cmp_mock_tester.controllers... import ...`、`from cmp_mock_tester.scripts.ca import ...`。
-   - 包外统一 `from cmp_mock_tester import ...`（`MockSpec`/`OMIT`/`Raw`/`general_name`
-     已 re-export；也可 `from cmp_mock_tester.cmpbuilder import ...`）。
-   - `cmp_mock_tester/cmpbuilder/cmp_mock.py` 不得反向 import `cmpbuilder`（会循环）。
+4. **所有 import 走顶层包 `cmp_mock_server`**：
+   - 包内互引：`from cmp_mock_server.cmpbuilder import ...`、
+     `from cmp_mock_server.controllers... import ...`、`from cmp_mock_server.scripts.ca import ...`。
+   - 包外统一 `from cmp_mock_server import ...`（`MockSpec`/`OMIT`/`Raw`/`general_name`
+     已 re-export；也可 `from cmp_mock_server.cmpbuilder import ...`）。
+   - `cmp_mock_server/cmpbuilder/cmp_mock.py` 不得反向 import `cmpbuilder`（会循环）。
 
 5. **sender/recipient 覆盖必须用 `general_name()` 包装**：
    `mock.header['sender']` 直接写进 GeneralName 字段，传裸 `x509.Name` 会被 asn1crypto 拒绝。
@@ -60,9 +60,9 @@ Claude Code 在每次会话会自动读取本文件作为项目上下文。请�
 - 依赖：`asn1crypto`、`oscrypto`、`certbuilder`（见 `pyproject.toml`）。
 - `tests/` 是**私有本地测试**（`.gitignore` 已排除，永不上传）：用例通过 MML 驱动
   真实对端，依赖现场网络/凭据与内部测试框架。无现场环境时，
-  只能做导入级验证。本地跑测试前先 `pip install -e .` 使 `cmp_mock_tester` 可导入。
+  只能做导入级验证。本地跑测试前先 `pip install -e .` 使 `cmp_mock_server` 可导入。
 - 语法/导入自检：`python -m py_compile <file>`；核心导入验证：
-  `python -c "from cmp_mock_tester import CmpServer, MockSpec, OMIT; print('OK')"`。
+  `python -c "from cmp_mock_server import CmpServer, MockSpec, OMIT; print('OK')"`。
 - 打包：`python -m build`；发布：`twine upload dist/*`。
 
 ## 已知待办
