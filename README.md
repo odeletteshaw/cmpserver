@@ -1,4 +1,4 @@
-# cmp-mock-tester
+# cmp-mock-server
 
 A field-level mocking **CMP (RFC 4210) CA simulator** for negative-testing
 certificate protocols.
@@ -30,8 +30,10 @@ certificate protocols.
 pip install -e .
 
 # 或直接从 PyPI 安装
-pip install cmp-mock-tester
+pip install cmp-mock-server
 ```
+
+> **安装名与导入名**：PyPI 包名为 `cmp-mock-server`，导入名仍为 `cmp_mock_tester`。
 
 > **Python 版本**：3.8+ 均可（纯 Python 实现，已在 3.10 / 3.14 / 3.15 实测通过）。
 
