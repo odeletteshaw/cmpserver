@@ -1,0 +1,23 @@
+# 私有本地测试 —— 永不上传（含现场环境/凭据，用户自有）
+tests/
+
+# 打包产物
+dist/
+build/
+*.egg-info/
+
+# Python 缓存 / 编译产物
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# 生成的证书 / 密钥
+*.pem
+
+# 虚拟环境
+.venv/
+venv/
+
+# macOS / 编辑器
+.DS_Store
+*.swp
