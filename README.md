@@ -33,8 +33,7 @@ pip install -e .
 pip install cmp-mock-tester
 ```
 
-> **Python 版本**：推荐 3.8 ~ 3.11。`oscrypto` / `certbuilder` 是较老的加密库，
-> 在 Python 3.12+ 上可能出现兼容性问题；遇到安装/导入报错优先换回 3.11 或以下。
+> **Python 版本**：3.8+ 均可（纯 Python 实现，已在 3.10 / 3.14 / 3.15 实测通过）。
 
 安装后可用一行命令验证核心模块可导入：
 
