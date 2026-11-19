@@ -423,6 +423,7 @@ class CMPResponseBuilder(object):
             sender_nonce=self._sender_nonce,
             recip_nonce=self._recip_nonce,
             protection_alg_id=prot_alg_id,
+            sender_kid=sender_kid,
         )
 
         return _assemble_message(
@@ -571,6 +572,7 @@ class CMPConfirmBuilder(object):
             sender_nonce=self._sender_nonce,
             recip_nonce=self._recip_nonce,
             protection_alg_id=prot_alg_id,
+            sender_kid=sender_kid,
         )
 
         return _assemble_message(

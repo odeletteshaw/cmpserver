@@ -1,7 +1,11 @@
 # coding: utf-8
+import logging
+
 from cmp_mock_tester.controllers.basic_server import BasicServer, Request, handler
 from cmp_mock_tester.controllers.handlers.cmpHandler import msgHandler
-from cmp_mock_tester.cmpbuilder import _coerce_general_name, MockSpec
+from cmp_mock_tester.cmpbuilder import MockSpec
+
+logger = logging.getLogger(__name__)
 
 
 def _writer(func):
@@ -17,7 +21,6 @@ class CmpServer(BasicServer):
         super().__init__(*args, **kwargs)
         self._ca_info = None
         self.mock = MockSpec()                 # 字段级 mock 注入入口（仅签名前篡改）
-        self.received_messages: list[bytes] = []
 
     @_writer
     def ca_info(self, data):
@@ -37,7 +40,12 @@ class CmpServer(BasicServer):
     @handler("POST", "/cmp")
     def cmp_receive(self, req: Request):
         der = req.body()  # 原始 DER bytes
-        res = msgHandler(self, der)
+        try:
+            res = msgHandler(self, der)
+        except Exception as exc:
+            logger.exception("处理 CMP 请求失败")
+            req.send_json({"error": str(exc)}, status=500)
+            return
         req.send_der(res)
 
     # ------------------------------------------------------------------

@@ -1,11 +1,7 @@
 # coding: utf-8
-import logging
-
 from cmp_mock_tester.asn1crypto_cmp.rfc4210 import PKIMessage
 from cmp_mock_tester.cmpbuilder import CMPResponseBuilder, CMPConfirmBuilder
 from cmp_mock_tester.scripts.ca import issue_end_entity
-
-logger = logging.getLogger(__name__)
 
 
 def msgHandler(cmp_config, req):
