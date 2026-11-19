@@ -23,7 +23,7 @@ from asn1crypto import x509, keys, core
 from asn1crypto.util import timezone
 from oscrypto import asymmetric, util
 
-from cmp_mock_server.asn1crypto_cmp.rfc4210 import *
+from cmpserver.asn1crypto_cmp.rfc4210 import *
 
 from .cmp_mock import _corrupt_bytes, MockSpec, OMIT, Raw, general_name
 

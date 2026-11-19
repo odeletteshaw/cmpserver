@@ -1,9 +1,9 @@
 # coding: utf-8
 import logging
 
-from cmp_mock_server.controllers.basic_server import BasicServer, Request, handler
-from cmp_mock_server.controllers.handlers.cmpHandler import msgHandler
-from cmp_mock_server.cmpbuilder import MockSpec
+from cmpserver.controllers.basic_server import BasicServer, Request, handler
+from cmpserver.controllers.handlers.cmpHandler import msgHandler
+from cmpserver.cmpbuilder import MockSpec
 
 logger = logging.getLogger(__name__)
 

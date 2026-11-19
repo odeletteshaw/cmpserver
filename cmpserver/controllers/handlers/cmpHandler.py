@@ -1,7 +1,7 @@
 # coding: utf-8
-from cmp_mock_server.asn1crypto_cmp.rfc4210 import PKIMessage
-from cmp_mock_server.cmpbuilder import CMPResponseBuilder, CMPConfirmBuilder
-from cmp_mock_server.scripts.ca import issue_end_entity
+from cmpserver.asn1crypto_cmp.rfc4210 import PKIMessage
+from cmpserver.cmpbuilder import CMPResponseBuilder, CMPConfirmBuilder
+from cmpserver.scripts.ca import issue_end_entity
 
 
 def msgHandler(cmp_config, req):
