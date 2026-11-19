@@ -4,21 +4,21 @@ Claude Code 在每次会话会自动读取本文件作为项目上下文。请�
 
 ## 项目是什么
 
-一个 **CMP（RFC 4210）CA 模拟器**，用于对**基站（EE）做证书协议负向测试**。
-它以 HTTP 服务扮演 CA，接收基站发来的 `ir`/`kur`/`certconf`，回以
+一个 **CMP（RFC 4210）CA 模拟器**，用于**证书协议负向测试**。
+它以 HTTP 服务扮演 CA，接收客户端（EE）发来的 `ir`/`kur`/`certconf`，回以
 `ip`/`kup`/`pkiconf`。核心能力是一个**字段级 mock 注入器**，可在**签名前**
-篡改响应报文的任意字段，验证基站是否正确拒绝异常证书响应。
+篡改响应报文的任意字段，验证对端是否正确拒绝异常证书响应。
 
 代码已整理为单一顶层包 `cmp_mock_tester`，可 `pip install` / 发布到 PyPI。
 
 ## 架构（自顶向下）
 
 ```
-真实基站(EE) --ir/kur/certconf(DER)--> [POST /cmp] CmpServer
+客户端(EE)   --ir/kur/certconf(DER)--> [POST /cmp] CmpServer
                                           └─ msgHandler 按 body 分发
                                               └─ issue_end_entity 签发 EE 证书
                                               └─ builder.build() --mock 注入--> 签名
-真实基站(EE) <--ip/kup/pkiconf(DER)-------- 返回
+客户端(EE)   <--ip/kup/pkiconf(DER)-------- 返回
 ```
 
 | 路径 | 职责 |
@@ -59,7 +59,7 @@ Claude Code 在每次会话会自动读取本文件作为项目上下文。请�
 
 - 依赖：`asn1crypto`、`oscrypto`、`certbuilder`（见 `pyproject.toml`）。
 - `tests/` 是**私有本地测试**（`.gitignore` 已排除，永不上传）：用例通过 MML 驱动
-  真实基站，依赖现场网络/凭据与内部测试框架。无现场环境时，
+  真实对端，依赖现场网络/凭据与内部测试框架。无现场环境时，
   只能做导入级验证。本地跑测试前先 `pip install -e .` 使 `cmp_mock_tester` 可导入。
 - 语法/导入自检：`python -m py_compile <file>`；核心导入验证：
   `python -c "from cmp_mock_tester import CmpServer, MockSpec, OMIT; print('OK')"`。

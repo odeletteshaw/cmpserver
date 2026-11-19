@@ -1,12 +1,12 @@
 # cmp-mock-tester
 
 A field-level mocking **CMP (RFC 4210) CA simulator** for negative-testing
-certificate protocols on base stations (EE).
+certificate protocols.
 
-一个用于**对基站（EE）做证书协议负向测试**的 CMP（RFC 4210）CA 模拟器。
-它以 HTTP 服务的形式扮演 CA，接收基站发来的 `ir` / `kur` / `certconf`，
-回以 `ip` / `kup` / `pkiconf`；核心能力是一个**通用字段注入器**，可在签名前
-对响应报文的任意字段做篡改，从而验证基站是否正确校验/拒绝异常证书响应。
+一个用于**证书协议负向测试**的 CMP（RFC 4210）CA 模拟器。它以 HTTP 服务的形式
+扮演 CA，接收客户端（EE，End Entity）发来的 `ir` / `kur` / `certconf`，回以
+`ip` / `kup` / `pkiconf`；核心能力是一个**通用字段注入器**，可在签名前对响应
+报文的任意字段做篡改，从而验证对端是否正确校验/拒绝异常证书响应。
 
 ---
 
@@ -59,7 +59,7 @@ with CmpServer(port=0, host="127.0.0.1") as srv:
     print("CMP 服务:", srv.url)   # http://127.0.0.1:<random-port>
 ```
 
-真实基站把 CMP 请求（`ir`/`kur`/`certconf`，DER，`application/pkixcmp`）POST 到
+客户端（EE）把 CMP 请求（`ir`/`kur`/`certconf`，DER，`application/pkixcmp`）POST 到
 `{srv.url}/cmp`，服务自动解析并返回对应的 `ip`/`kup`/`pkiconf`。
 
 ---
@@ -78,7 +78,7 @@ mock.reset()           清空
 ```
 
 - **签名前注入**：`header` / `body` 的覆盖发生在计算 PKIProtection 之前，签名覆盖篡改后内容 ——
-  用于测设备的**字段语义校验**（会不会因字段非法而拒绝）。
+  用于测对端的**字段语义校验**（会不会因字段非法而拒绝）。
 - **验签单独测**：用 `mock.protection` 旋钮。
 - **绕过 builder 校验**：注入不经过 builder 的类型/合法值 setter，可填“协议非法但结构合法”的值。
 
@@ -112,7 +112,7 @@ srv.mock.extra_certs = OMIT                                           # 不带 e
 ## 架构
 
 ```
-真实基站 (EE)                         CMP 模拟器 (CA)
+客户端 (EE)                            CMP 模拟器 (CA)
      │   ir / kur / certconf  (DER, application/pkixcmp)   │
      │ ─────────────────────────────────────────────────► │  POST /cmp
      │                                                     │    └─ msgHandler 分发
@@ -132,14 +132,14 @@ srv.mock.extra_certs = OMIT                                           # 不带 e
 | ASN.1 | `cmp_mock_tester/asn1crypto_cmp/rfc4210.py` | CMP/CRMF 结构定义，`PKIMessage.load/dump` 的依据 |
 | 证书 | `cmp_mock_tester/scripts/ca.py` | 自签根 CA、签发 EE 证书 |
 
-`ir` / `kur` / `certconf` 由真实基站主动发出，模拟器只**收取解析**、不构建；
+`ir` / `kur` / `certconf` 由客户端（EE）主动发出，模拟器只**收取解析**、不构建；
 模拟器只构建 CA→EE 方向的 `ip` / `kup` / `pkiconf`（及 `error`）。
 
 ---
 
 ## 目录结构
 
-```
+```text
 cmp_mock_tester/
 ├── __init__.py               # 公开 API re-export + __version__
 ├── cmpbuilder/               # CMP 报文构建器（包）
@@ -156,7 +156,7 @@ cmp_mock_tester/
     └── ca.py                 # create_root_cert / issue_end_entity —— 证书工厂
 ```
 
-> `tests/` 目录为**私有本地测试**，依赖内部测试框架与真实基站环境，**不在本仓库/包中**。
+> `tests/` 目录为**私有本地测试**，依赖内部测试框架与真实对端环境，**不在本仓库/包中**。
 
 ---
 

@@ -2,7 +2,7 @@
 """cmp-mock-tester — a CMP (RFC 4210) CA simulator with field-level mocking.
 
 The simulator acts as a Certificate Authority over HTTP: it receives ``ir`` /
-``kur`` / ``certconf`` from a base station (EE) and replies with ``ip`` /
+``kur`` / ``certconf`` from a client (EE) and replies with ``ip`` /
 ``kup`` / ``pkiconf``. Its core feature is a field-level mock injector that
 can tamper with any response field *before* signing, to verify that the EE
 correctly rejects malformed certificate responses.
