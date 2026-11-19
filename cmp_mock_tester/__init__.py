@@ -20,7 +20,7 @@ from cmp_mock_tester.cmpbuilder import (
 from cmp_mock_tester.controllers.cmp_server import CmpServer
 from cmp_mock_tester.scripts.ca import create_root_cert, issue_end_entity
 
-__version__ = '0.1.1'
+__version__ = '0.1.2'
 
 __all__ = [
     'CMPResponseBuilder',
